@@ -2,18 +2,37 @@ import "../Style/profile.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Fragment, useState, useEffect } from "react";
 
+interface Product {
+  image: string;
+  name: string;
+  description: string;
+  category: string;
+  price: number;
+}
+
 function ProductInfo() {
-  const [inputValue, setInputValue] = useState({});
+  const [inputValue, setInputValue] = useState<Product>({
+    image: "",
+    name: "",
+    description: "",
+    category: "",
+    price: 0,
+  });
+
   const productID = localStorage.getItem("productID");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:3002/products/${productID}`, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `/api/products/${productID}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
         const data = await response.json();
         console.log(data);
         setInputValue(data);
@@ -27,9 +46,11 @@ function ProductInfo() {
 
   const onSubmithandler = () => {
     const token = localStorage.getItem("token");
+
     if (token) {
       console.log("Add to cart");
-      fetch(`http://localhost:3003/cart/${productID}`, {
+
+      fetch(`/api/cart/${productID}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -49,9 +70,6 @@ function ProductInfo() {
           console.error("Error:", error);
         });
     }
-
-  
-
   };
 
   return (
@@ -62,22 +80,29 @@ function ProductInfo() {
             <div className="page-content">
               <div className="row">
                 <div className="col-lg-12">
-                  <div className="main-profile ">
+                  <div className="main-profile">
                     <div className="row">
                       <div className="col-lg-4">
                         <img src={inputValue.image} alt="" />
                       </div>
+
                       <div className="col-lg-4 align-self-center">
                         <div className="main-info header-text">
                           <h4>{inputValue.name}</h4>
                           <p>{inputValue.description}</p>
+
                           <div className="main-button">
-                            <button className="searchButton" type="button" onClick={onSubmithandler}>
+                            <button
+                              className="searchButton"
+                              type="button"
+                              onClick={onSubmithandler}
+                            >
                               Add To Cart
                             </button>
                           </div>
                         </div>
                       </div>
+
                       <div className="col-lg-4 align-self-center">
                         <ul>
                           <li>

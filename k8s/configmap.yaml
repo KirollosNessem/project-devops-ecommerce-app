@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: ecommerce-config
+  namespace: ecommerce
+
+data:
+  NODE_ENV: "production"
+
+  PRODUCT_PORT: "3002"
+  USER_PORT: "3001"
+  CART_PORT: "3003"

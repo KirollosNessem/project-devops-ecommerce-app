@@ -1,20 +1,52 @@
-version: '3'
+version: '3.8'
+
 services:
   user:
-    image: user
+    build: ./User
+    image: ecommerce-user:v1
+    container_name: user-service
     ports:
       - "3001:3001"
-    command: node server.js
+    env_file:
+      - ./User/.env
+    networks:
+      - ecommerce-network
 
   cart:
-    image: cart
+    build: ./Cart
+    image: ecommerce-cart:v1
+    container_name: cart-service
     ports:
       - "3003:3003"
-    command: node server.js  
+    env_file:
+      - ./Cart/.env
+    networks:
+      - ecommerce-network
 
   product:
-    image: product
+    build: ./Product
+    image: ecommerce-product:v1
+    container_name: product-service
     ports:
       - "3002:3002"
-    command: node server.js
-    
+    env_file:
+      - ./Product/.env
+    networks:
+      - ecommerce-network
+
+  frontend:
+    build: ./front-end
+    image: ecommerce-frontend:v1
+    container_name: frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - user
+      - cart
+      - product
+    networks:
+      - ecommerce-network
+
+networks:
+  ecommerce-network:
+    driver: bridge
