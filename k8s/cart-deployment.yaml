@@ -16,18 +16,45 @@ spec:
     metadata:
       labels:
         app: cart-service
+        version: v1
 
     spec:
       containers:
         - name: cart-service
           image: ecommerce-cart:v1
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
 
           command: ["node"]
           args: ["server.js"]
 
           ports:
             - containerPort: 3003
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3003
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3003
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
 
           env:
             - name: PORT

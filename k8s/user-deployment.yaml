@@ -20,14 +20,40 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: ecommerce-user:v1
-          imagePullPolicy: Never
+          image: ecommerce-user:v2
+          imagePullPolicy: IfNotPresent
 
           command: ["node"]
           args: ["server.js"]
 
           ports:
             - containerPort: 3001
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
 
           env:
             - name: PORT

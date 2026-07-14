@@ -17,6 +17,15 @@ app.use("/users", require("./routes/userRouter"))
 
 
 
+app.get("/health", (req, res) => {
+    res.status(200).json({
+        status: "UP",
+        service: "user-service"
+    });
+});
+
+
+
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });

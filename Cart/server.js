@@ -16,6 +16,13 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/cart", require("./routes/cartRouter"))
 
+app.get("/health", (req, res) => {
+    res.status(200).json({
+        status: "UP",
+        service: "cart-service"
+    });
+});
+
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
