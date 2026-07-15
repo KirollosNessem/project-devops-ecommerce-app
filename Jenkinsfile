@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        REGISTRY = 'kero-dockerhub-username'   // غيّرها ليوزرك الحقيقي في Docker Hub
+        REGISTRY = 'keronisem11'   // غيّرها ليوزرك الحقيقي في Docker Hub
         NAMESPACE = 'ecommerce'
     }
 
