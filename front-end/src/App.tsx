@@ -8,13 +8,15 @@ import Home from "./pages/Home";
 import Cart from "./pages/Cart";
 import CheckOut from "./pages/CheckOut";
 import NavBar from "./component/NavBar";
+
 function App() {
   return (
-    <Fragment>
-      <NavBar />
-      <Router>
+    <Router>
+      <Fragment>
+        <NavBar />
+
         <Routes>
-          <Route index path="/" element={<Home />} />
+          <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<Profile />} />
@@ -22,8 +24,10 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<CheckOut />} />
         </Routes>
-      </Router>
-    </Fragment>
+
+      </Fragment>
+    </Router>
   );
 }
+
 export default App;
