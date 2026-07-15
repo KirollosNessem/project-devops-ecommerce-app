@@ -20,8 +20,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ecommerce-frontend:v1
-          imagePullPolicy: Never
+          image: localhost:5000/ecommerce-frontend:v2
+          imagePullPolicy: IfNotPresent
 
           ports:
             - containerPort: 80
