@@ -29,7 +29,6 @@ pipeline {
                 script {
                     def scannerHome = tool 'SonarScanner'
                     withSonarQubeEnv('SonarQube') {
-                        sh 'echo "TOKEN_LENGTH=${#SONAR_AUTH_TOKEN}"'
                         sh """
                             ${scannerHome}/bin/sonar-scanner \
                               -Dsonar.projectKey=ecommerce-app \
@@ -59,6 +58,15 @@ pipeline {
             steps {
                 script {
                     dockerImage = docker.build("${REGISTRY}/cart:${env.BUILD_NUMBER}", "./Cart")
+
+                    sh """
+                        trivy image --severity HIGH,CRITICAL --exit-code 0 \
+                          --format table ${REGISTRY}/cart:${env.BUILD_NUMBER}
+                    """
+                    // ليه --exit-code 0 دلوقتي: بيخلي الفحص "تحذيري" بس،
+                    // يعني يوريك النتيجة في اللوج من غير ما يوقف الـ Pipeline
+                    // بمجرد ما تشوف حجم المشاكل، ممكن نغيرها لـ --exit-code 1 لاحقاً
+
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-creds') {
                         dockerImage.push()
                         dockerImage.push('latest')
@@ -72,6 +80,12 @@ pipeline {
             steps {
                 script {
                     dockerImage = docker.build("${REGISTRY}/product:${env.BUILD_NUMBER}", "./Product")
+
+                    sh """
+                        trivy image --severity HIGH,CRITICAL --exit-code 0 \
+                          --format table ${REGISTRY}/product:${env.BUILD_NUMBER}
+                    """
+
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-creds') {
                         dockerImage.push()
                         dockerImage.push('latest')
@@ -85,6 +99,12 @@ pipeline {
             steps {
                 script {
                     dockerImage = docker.build("${REGISTRY}/user:${env.BUILD_NUMBER}", "./User")
+
+                    sh """
+                        trivy image --severity HIGH,CRITICAL --exit-code 0 \
+                          --format table ${REGISTRY}/user:${env.BUILD_NUMBER}
+                    """
+
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-creds') {
                         dockerImage.push()
                         dockerImage.push('latest')
