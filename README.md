@@ -60,7 +60,7 @@ http://localhost:5173/
 ## Products json file
 - [Products json file](https://github.com/Andrewaziz99/E-Commerce_Web_Application/blob/main/products.json)
 
-## Technologiess
+## Technologies
 - [React vite](https://vitejs.dev/)
 - [Node.js](https://nodejs.org/en/)
 - [Express](https://expressjs.com/)
