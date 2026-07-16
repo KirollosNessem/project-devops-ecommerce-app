@@ -29,6 +29,7 @@ pipeline {
                 script {
                     def scannerHome = tool 'SonarScanner'
                     withSonarQubeEnv('SonarQube') {
+                        sh 'echo "TOKEN_LENGTH=${#SONAR_AUTH_TOKEN}"'
                         sh """
                             ${scannerHome}/bin/sonar-scanner \
                               -Dsonar.projectKey=ecommerce-app \
