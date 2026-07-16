@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        REGISTRY = 'keronisem11'   // غيّرها ليوزرك الحقيقي في Docker Hub
+        REGISTRY = 'keronisem11'   
         NAMESPACE = 'ecommerce'
     }
 
@@ -23,6 +23,35 @@ pipeline {
                 }
             }
         }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarScanner'
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                              -Dsonar.projectKey=ecommerce-app \
+                              -Dsonar.sources=. \
+                              -Dsonar.host.url=\$SONAR_HOST_URL \
+                              -Dsonar.login=\$SONAR_AUTH_TOKEN
+                        """
+                    }
+                }
+            }
+        }
+        // ليه هنا بالتحديد: قبل ما نبني أي Docker image،
+        // نفحص جودة الكود نفسه (bugs, code smells, duplications)
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+        // ليه: لو الكود فشل معايير SonarQube (Quality Gate)،
+        // الـ Pipeline يوقف هنا تلقائياً، وميوصلش لمرحلة البناء والنشر خالص
 
         stage('Build & Push - Cart') {
             when { environment name: 'CART_CHANGED', value: 'true' }
