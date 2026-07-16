@@ -11,7 +11,7 @@ Use the package manager [npm](https://www.npmjs.com/) to install dependencies.
 npm install
 ```
 
-## Usages
+## Usage
 
 1. Create a .env file in the root directory and add the following environment variables (replace all #### with your own values):
 ```bash
