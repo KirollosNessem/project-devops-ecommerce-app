@@ -20,7 +20,6 @@ pipeline {
                     env.CART_CHANGED    = sh(script: "git diff --name-only HEAD~1 HEAD | grep -q '^Cart/' && echo true || echo false", returnStdout: true).trim()
                     env.PRODUCT_CHANGED = sh(script: "git diff --name-only HEAD~1 HEAD | grep -q '^Product/' && echo true || echo false", returnStdout: true).trim()
                     env.USER_CHANGED    = sh(script: "git diff --name-only HEAD~1 HEAD | grep -q '^User/' && echo true || echo false", returnStdout: true).trim()
-                    env.FRONTEND_CHANGED = sh(script: "git diff --name-only HEAD~1 HEAD | grep -q '^front-end/' && echo true || echo false", returnStdout: true).trim()
                 }
             }
         }
@@ -114,25 +113,6 @@ pipeline {
             }
         }
 
-        stage('Build & Push - Frontend') {
-            when { environment name: 'FRONTEND_CHANGED', value: 'true' }
-            steps {
-                script {
-                    dockerImage = docker.build("${REGISTRY}/frontend:${env.BUILD_NUMBER}", "./front-end")
-
-                    sh """
-                        trivy image --severity HIGH,CRITICAL --exit-code 0 \
-                          --format table ${REGISTRY}/frontend:${env.BUILD_NUMBER}
-                    """
-
-                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-creds') {
-                        dockerImage.push()
-                        dockerImage.push('latest')
-                    }
-                }
-            }
-        }
-
         stage('Deploy to Minikube') {
             steps {
                 withKubeConfig([credentialsId: 'kubeconfig-minikube']) {
@@ -145,9 +125,6 @@ pipeline {
                         }
                         if (env.USER_CHANGED == 'true') {
                             sh "kubectl set image deployment/user-deployment user-service=${REGISTRY}/user:${env.BUILD_NUMBER} -n ${NAMESPACE}"
-                        }
-                        if (env.FRONTEND_CHANGED == 'true') {
-                            sh "kubectl set image deployment/frontend-deployment frontend=${REGISTRY}/frontend:${env.BUILD_NUMBER} -n ${NAMESPACE}"
                         }
                     }
                 }
@@ -166,9 +143,6 @@ pipeline {
                         }
                         if (env.USER_CHANGED == 'true') {
                             sh "kubectl rollout status deployment/user-deployment -n ${NAMESPACE} --timeout=90s"
-                        }
-                        if (env.FRONTEND_CHANGED == 'true') {
-                            sh "kubectl rollout status deployment/frontend-deployment -n ${NAMESPACE} --timeout=90s"
                         }
                     }
                 }
